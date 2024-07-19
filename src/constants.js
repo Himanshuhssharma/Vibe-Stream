@@ -1,1 +1,1 @@
-export const DB_NAME = "vibestream"
+export const DB_NAME = "vibestream";
