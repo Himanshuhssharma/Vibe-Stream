@@ -19,4 +19,6 @@ import userRouter from "./routes/user.routes.js";
 
 app.use("/api/v1/users", userRouter);
 
+// URL will be https://localhost:8000//api/v1/users/jo bhi aage ayega
+
 export default app;
