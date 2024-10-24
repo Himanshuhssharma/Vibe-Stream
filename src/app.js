@@ -11,9 +11,9 @@ app.use(
   })
 );
 
+app.use(cookieParser());
 app.use(express.json({ limit: "20kb" })); //limit the form data
 app.use(express.urlencoded({ limit: "20kb", extended: true })); // make the data coming from URL in a same format
-app.use(cookieParser());
 
 import userRouter from "./routes/user.routes.js";
 
