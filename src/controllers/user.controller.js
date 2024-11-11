@@ -387,7 +387,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         );
 });
 
-const getWatchHostory = asyncHandler(async (req, res) => {
+const getWatchHistory = asyncHandler(async (req, res) => {
     // req.user._id se hume ek string milti hai ID ki jo ki mongoDB provide krta hai, but if we use it in any commands, mongoose automatically converts it behind the scenes.
 
     const user = await User.aggregate([
@@ -454,5 +454,5 @@ export {
     updateAvatar,
     updateCoverImage,
     getUserChannelProfile,
-    getWatchHostory,
+    getWatchHistory,
 };
