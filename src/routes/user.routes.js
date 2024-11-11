@@ -36,16 +36,15 @@ userRouter.route("/login").post(loginUser);
 //secure route
 userRouter.route("/logout").post(verifyJWT, logoutUser);
 userRouter.route("/refresh-token").post(refreshAccessToken);
-router.route("/change-password").post(verifyJWT, changePassword);
-router.route("/current-user").get(verifyJWT, getCurrentUser);
-router.route("/update-account").patch(verifyJWT, updateAccountDetails);
-router
+userRouter.route("/change-password").post(verifyJWT, changePassword);
+userRouter.route("/current-user").get(verifyJWT, getCurrentUser);
+userRouter.route("/update-account").patch(verifyJWT, updateAccountDetails);
+userRouter
     .route("/update-avatar")
     .patch(verifyJWT, upload.single("avatar"), updateAvatar);
-router
+userRouter
     .route("/update-cover_image")
-    .patch(verifyJWT, upload.single("/coverImage"), updateCoverImage);
-router.route("/watch-history").get(getWatchHistory);
-router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
-router.route("/history").get(verifyJWT, getWatchHistory);
+    .patch(verifyJWT, upload.single("coverImage"), updateCoverImage);
+userRouter.route("/c/:username").get(verifyJWT, getUserChannelProfile);
+userRouter.route("/history").get(verifyJWT, getWatchHistory);
 export default userRouter;

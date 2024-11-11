@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const generateAccessandRefreshTokens = async (userId) => {
     try {
@@ -13,6 +14,7 @@ const generateAccessandRefreshTokens = async (userId) => {
         const refreshToken = user.generateRefreshToken();
 
         user.refreshToken = refreshToken;
+
         await user.save({ validateBeforeSave: false });
 
         return { accessToken, refreshToken };
@@ -144,8 +146,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
 const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(req.user._id, {
-        $set: {
-            refreshToken: undefined,
+        $unset: {
+            refreshToken: 1, //this will remove the field from the documennt
         },
 
         new: true,
@@ -176,7 +178,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         process.env.REFRESH_TOKEN_SECRET
     );
 
-    const user = User.findById(decodedToken?._id);
+    const user = await User.findById(decodedToken?._id);
 
     if (!user) {
         throw new ApiError(401, "Invalid refresh token");
@@ -208,7 +210,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
         .status(200)
-        .json(200, req.user, "Current User fetched successfully");
+        .json(
+            new ApiResponse(200, req.user, "Current User fetched successfully")
+        );
 });
 
 const changePassword = asyncHandler(async (req, res) => {
@@ -216,6 +220,10 @@ const changePassword = asyncHandler(async (req, res) => {
 
     if (newPassword !== confPassword) {
         throw new ApiError(401, "Password doesn't match");
+    }
+
+    if (oldPassword === newPassword) {
+        throw new ApiError(401, "New password cannot be the same as current");
     }
 
     const user = await User.findById(req.user?._id);
