@@ -387,6 +387,62 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         );
 });
 
+const getWatchHostory = asyncHandler(async (req, res) => {
+    // req.user._id se hume ek string milti hai ID ki jo ki mongoDB provide krta hai, but if we use it in any commands, mongoose automatically converts it behind the scenes.
+
+    const user = await User.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user._id), // here we have to convert ID manually from string bcz aggregation code directly goes to mongoDB
+            },
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullname: 1,
+                                        userName: 1,
+                                        avatar: 1,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        $addFields: {
+                            owner: {
+                                $first: "$owner",
+                            },
+                        },
+                    },
+                ],
+            },
+        },
+    ]);
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                user[0].watchHistory,
+                "Watch history fetched successfully"
+            )
+        );
+});
+
 export {
     registerUser,
     loginUser,
@@ -398,4 +454,5 @@ export {
     updateAvatar,
     updateCoverImage,
     getUserChannelProfile,
+    getWatchHostory,
 };
